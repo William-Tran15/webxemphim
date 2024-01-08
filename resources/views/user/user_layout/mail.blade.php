@@ -44,7 +44,7 @@
 <body>
     <div id='body' class="center">
         <div>
-            <h4>Bạn đã sử dụng chức năng khôi phục mật khẩu tại <b>MinMovies</b> với Email</h4>
+            <h4>Bạn đã sử dụng chức năng khôi phục mật khẩu tại <b>Movies</b> với Email</h4>
             <h5>{{ $email }}</h5>
             <hr>
             <h5>Bạn vui lòng nhấp vào liên kết bên dưới để đổi mật khẩu mới!</h5>

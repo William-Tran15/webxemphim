@@ -30,6 +30,92 @@ class MovieController extends Controller
      * @return \Illuminate\Http\Response
      */
 
+     public function contentBasedRecommendation($movieId)
+     {
+         $targetMovie = Movie::find($movieId);
+     
+         // Extract relevant features for the target movie
+         $targetFeatures = [
+             $targetMovie->cate_id,
+             $targetMovie->nation_id,
+             $targetMovie->year_id,
+             $targetMovie->language_id,
+             strtolower($targetMovie->director),
+             strtolower($targetMovie->actor),
+         ];
+     
+         // Fetch all movies with relevant features
+         $allMovies = Movie::select('id', 'vie_name', 'eng_name', 'cate_id', 'nation_id', 'year_id', 'language_id', 'director', 'actor', 'poster_image', 'time', 'price', 'quality')
+             ->where('id', '!=', $movieId)
+             ->get();
+     
+         // Calculate similarity scores
+         $similarMovies = $allMovies->map(function ($otherMovie) use ($targetFeatures) {
+             $otherFeatures = [
+                 $otherMovie->cate_id,
+                 $otherMovie->nation_id,
+                 $otherMovie->year_id,
+                 $otherMovie->language_id,
+                 strtolower($otherMovie->director),
+                 strtolower($otherMovie->actor),
+             ];
+     
+             // Calculate cosine similarity
+             $similarity = $this->calculateCosineSimilarity($targetFeatures, $otherFeatures);
+     
+             return [
+                 'id' => $otherMovie->id,
+                 'vie_name' => $otherMovie->vie_name,
+                 'eng_name' => $otherMovie->eng_name,
+                 'year_id' => $otherMovie->year_id,
+                 'language_id' => $otherMovie->language_id,
+                 'similarity' => $similarity,
+                 'poster_image' => $otherMovie->poster_image,
+                 'time' => $otherMovie->time,
+                 'price' => $otherMovie->price,
+                 'quality' => $otherMovie->quality,
+             ];
+         });
+     
+         // Sort movies by similarity in descending order
+         $recommendedMovies = $similarMovies->sortByDesc('similarity')->take(8)->toArray();
+        // dd($recommendedMovies);
+         return $recommendedMovies;
+     }
+     
+
+    private function calculateCosineSimilarity($vector1, $vector2)
+    {
+        $dotProduct = 0;
+        $magnitude1 = 0;
+        $magnitude2 = 0;
+    
+        // Calculate dot product and magnitudes
+        for ($i = 0; $i < count($vector1); $i++) {
+            if (is_numeric($vector1[$i]) && is_numeric($vector2[$i])) {
+                $dotProduct += $vector1[$i] * $vector2[$i];
+                $magnitude1 += pow($vector1[$i], 2);
+                $magnitude2 += pow($vector2[$i], 2);
+            } else {
+                // Handle non-numeric values as needed (skip, set to 0, etc.)
+            }
+        }
+    
+        $magnitude1 = sqrt($magnitude1);
+        $magnitude2 = sqrt($magnitude2);
+    
+        // Avoid division by zero
+        if ($magnitude1 == 0 || $magnitude2 == 0) {
+            return 0;
+        }
+    
+        // Calculate cosine similarity
+        $similarity = $dotProduct / ($magnitude1 * $magnitude2);
+    
+        return $similarity;
+    }
+    
+
     public function detailmovie($id)
     {
         $wallet = '';
@@ -51,6 +137,7 @@ class MovieController extends Controller
         $comment = Comment::where('movie_id', $id)->get();
         $user = User::all();
         $rate = Rate::where('movie_id', $id)->get();
+        $similarMovies = $this->contentBasedRecommendation($id);
         if ($rate->isEmpty()) {
             # code...
             $averageRate = 0;
@@ -68,7 +155,7 @@ class MovieController extends Controller
         }
 
 
-        return view('user.detailmovie', compact('slider', 'id', 'movie', 'cate', 'nation', 'year', 'language', 'user', 'comment', 'wallet', 'payment', 'user_id', 'averageRate', 'totalRate'));
+        return view('user.detailmovie', compact('slider', 'id', 'movie', 'cate', 'nation', 'year', 'language', 'user', 'comment', 'wallet', 'payment', 'user_id', 'averageRate', 'totalRate', 'similarMovies'));
     }
     public function watchmovie($id, $server)
     {

@@ -1,0 +1,105 @@
+<?php $__env->startSection('title','Tìm Kiếm - MinMovies'); ?>
+<?php $__env->startSection('content'); ?>
+<div class="general-agileits-w3l">
+    <div class="w3l-medile-movies-grids">
+        <!-- /movie-browse-agile -->
+        <div class="movie-browse-agile">
+            <!--/browse-agile-w3ls -->
+            <div class="browse-agile-w3ls general-w3ls">
+                <div class="tittle-head">
+                    <h4 class="latest-text">
+                        Tìm kiếm
+                    </h4>
+                    <div class="container">
+                        <div class="agileits-single-top">
+                            <ol class="breadcrumb">
+                                <li><a href="">Trang Chủ</a></li>
+                                <li class="active">Tìm kiếm</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="browse-inner">
+                        <form action="<?php echo e(route('user.searchSort')); ?>" method="post">
+                            <?php echo csrf_field(); ?>
+                            <input type="text" name="searchSort" id="" value="<?php echo e($searchSort); ?>">
+                            <select name="cateSort" id="">
+                                <option data-display="Thể Loại">Chưa chọn...</option>
+                                <?php $__currentLoopData = $cate; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php if($cateSort->id==$item->id): ?>
+                                <option selected value="<?php echo e($item->id); ?>"><?php echo e($item->cate_name); ?></option>
+                                <?php else: ?>
+                                <option value="<?php echo e($item->id); ?>"><?php echo e($item->cate_name); ?></option>
+
+                                <?php endif; ?>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </select>
+                            <input type="submit" value="Tìm">
+                        </form>
+                        <?php if($movie->isEmpty()): ?>
+                        <h3 class="text-center">Không tìm thấy phim nào!</h3>
+                        <?php else: ?>
+                        <h3 class="text-center">Tìm thấy "<b><?php echo e(count($movie)); ?></b>" kết quả với từ khoá
+                            "<b><?php echo e($searchSort); ?></b>"</h3><br>
+                        <?php endif; ?>
+                        <?php $__currentLoopData = $movie; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="col-md-2 w3l-movie-gride-agile">
+                            <a href="<?php echo e(route('user.movie',$item->id)); ?>"
+                                title="<?php echo e($item->vie_name.' ('.$item->eng_name.')'); ?>"
+                                class="hvr-shutter-out-horizontal"><img
+                                    src="<?php echo e('storage/app/poster/'.$item->poster_image); ?>"
+                                    title="<?php echo e($item->vie_name.' ('.$item->eng_name.')'); ?>" class="img-responsive"
+                                    alt=" " />
+                                <div class="w3l-action-icon"><i class="fa fa-play-circle" aria-hidden="true"></i></div>
+                            </a>
+                            <div class="mid-1">
+                                <div class="w3l-movie-text">
+                                    <h6><a href="<?php echo e(route('user.movie',$item->id)); ?>"
+                                            title="<?php echo e($item->vie_name.' ('.$item->eng_name.')'); ?>"><?php echo e($item->vie_name); ?></a>
+                                    </h6>
+                                </div>
+                                <div class="mid-2">
+                                    <p>
+                                        <?php $__currentLoopData = $year; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item2): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <?php if($item2->id==$item->year_id): ?>
+                                        <?php echo e($item2->year); ?>
+
+                                        <?php endif; ?>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </p>
+                                    <div class="block-stars">
+                                        <ul class="w3l-ratings">
+                                            <p><?php echo e($item->time); ?></p>
+                                        </ul>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                            <div class="ribben">
+                                <?php $__currentLoopData = $language; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lang): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php if($item->language_id==$lang->id): ?>
+                                <a href="<?php echo e(route('user.movie',$item->id)); ?>"
+                                    title="<?php echo e($item->vie_name.' ('.$item->eng_name.')'); ?>">
+                                    <p><?php echo e($item->quality.'-'.$lang->language); ?></p>
+                                </a>
+                                <?php endif; ?>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+                        </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <div class="clearfix"> </div>
+                    </div>
+                </div>
+            </div>
+            <!--//browse-agile-w3ls -->
+            <div class="blog-pagenat-wthree">
+                <ul>
+                    <?php echo e($movie->links()); ?>
+
+                </ul>
+            </div>
+        </div>
+        <?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('user.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\webxemphim\resources\views/user/searchSort.blade.php ENDPATH**/ ?>

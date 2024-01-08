@@ -185,10 +185,10 @@
             <div class="col-md-4">
                 <div class="moviedetailinfor">
                     <p>
-                        <h4><b>Nội dung</b></h4>{!!$movie->information!!}
+                    <h4><b>Nội dung</b></h4>{!!$movie->information!!}
                     </p>
                     <p>
-                        <h4><b>Trailer</b></h4>
+                    <h4><b>Trailer</b></h4>
                     </p>
                     <div class="video-responsive">
                         {!! $movie->trailer !!}
@@ -357,7 +357,7 @@
         @if (!$slider->isEmpty())
         <!-- slider-bottom -->
         <div class="banner-bottom">
-            <h3 class="text-uppercase text-lg text-bold">Đề xuất </h3><br>
+            <h3 class="text-uppercase text-lg text-bold">Phim cùng thể loại </h3><br>
             <div class="container text-center">
                 <div class="w3_agile_banner_bottom_grid">
                     <div id="owl-demo" class="owl-carousel owl-theme">
@@ -416,8 +416,77 @@
         </div>
         <!-- slider-bottom -->
         @endif
+        <!-- Content-Based Recommendation Section -->
+        
+        <div class="row">
+    <div class="col-md-12">
+        <div class="content-based-recommendation">
+            <h3 class="text-uppercase text-lg text-bold"> ĐỀ XUẤT </h3>
+            <div class="movie-list row">
+                @php $count = 0; @endphp
+                @foreach ($similarMovies as $similarMovie)
+                    @if ($count % 4 == 0)
+                        </div><div class="row">
+                    @endif
+                    <div class="col-md-3">
+                        <div class="movie-item">
+                            <a href="{{ route('user.movie', $similarMovie['id']) }}" title="{{ $similarMovie['vie_name'] . (isset($similarMovie['eng_name']) ? ' (' . $similarMovie['eng_name'] . ')' : '') }}" class="hvr-shutter-out-horizontal">
+                                <img src="{{ 'storage/app/poster/' . $similarMovie['poster_image'] }}" title="{{ $similarMovie['vie_name'] . (isset($similarMovie['eng_name']) ? ' (' . $similarMovie['eng_name'] . ')' : '') }}" class="img-responsive" alt=" " />
+                                <div class="w3l-action-icon"><i class="fa fa-play-circle" aria-hidden="true"></i></div>
+                            </a>
+                            <div class="movie-details mt-2">
+                                <div class="w3l-movie-text">
+                                    <a href="{{ route('user.movie', $similarMovie['id']) }}" title="{{ $similarMovie['vie_name'] }}">{{ $similarMovie['vie_name'] }}</a>
+                                </div>
+                                <p>
+                                    @foreach ($year as $item)
+                                        @if ($item->id == $similarMovie['year_id'])
+                                            {{ $item->year }}
+                                        @endif
+                                    @endforeach
+                                </p>
+                                <div class="block-stars">
+                                    <ul class="w3l-ratings">
+                                        <p>{{ $similarMovie['time'] }}</p>
+                                    </ul>
+                                </div>
+                                <div class="ribben">
+                                    @foreach ($language as $lang)
+                                        @if ($similarMovie['language_id'] == $lang->id)
+                                            <a href="{{ route('user.movie', $similarMovie['id']) }}" title="{{ $similarMovie['vie_name'] . (isset($similarMovie['eng_name']) ? ' (' . $similarMovie['eng_name'] . ')' : '') }}">
+                                                <p>{{ $similarMovie['quality'] . '-' . $lang->language }}</p>
+                                            </a>
+                                        @endif
+                                    @endforeach
+                                </div>
+                                <div class="ribbennew5">
+                                    <span class="badge badge-pill badge-danger price2 text-center" style="margin-top:5px;">
+                                        @if ($similarMovie['price'] == 0)
+                                            Miễn phí
+                                        @else
+                                            {{ number_format(round($similarMovie['price'])) . 'đ' }}
+                                        @endif
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @php $count++; @endphp
+                @endforeach
+            </div>
+        </div>
     </div>
 </div>
+
+
+
+
+        <!-- End Content-Based Recommendation Section -->
+    </div>
+</div>
+
+
+
 <script>
     //Code nút xoá
     $('[data-toggle="confirm"]').jConfirm({
@@ -450,5 +519,8 @@
 
     });
 </script>
+
+
+
 <!----------------- Movie list end -------------------->
 @endsection
